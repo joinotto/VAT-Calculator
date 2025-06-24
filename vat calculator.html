@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Calculator</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .vat-calculator-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="vat-calculator-root" class="vat-calculator-container"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Countries data
+        const countries = [
+            { name: "Albania", vatRate: 20 },
+            { name: "Algeria", vatRate: 19 },
+            { name: "Andorra", vatRate: 4.5 },
+            { name: "Angola", vatRate: 14 },
+            { name: "Argentina", vatRate: 21 },
+            { name: "Armenia", vatRate: 20 },
+            { name: "Australia", vatRate: 10 },
+            { name: "Austria", vatRate: 20 },
+            { name: "Azerbaijan", vatRate: 18 },
+            { name: "Bahamas", vatRate: 10 },
+            { name: "Bahrain", vatRate: 10 },
+            { name: "Bangladesh", vatRate: 15 },
+            { name: "Barbados", vatRate: 17.5 },
+            { name: "Belgium", vatRate: 21 },
+            { name: "Bolivia", vatRate: 13 },
+            { name: "Botswana", vatRate: 14 },
+            { name: "Brazil", vatRate: 18 },
+            { name: "Bulgaria", vatRate: 20 },
+            { name: "Cambodia", vatRate: 10 },
+            { name: "Canada", vatRate: 5 },
+            { name: "Cape Verde", vatRate: 15 },
+            { name: "Chad", vatRate: 18 },
+            { name: "Chile", vatRate: 19 },
+            { name: "China", vatRate: 13 },
+            { name: "Colombia", vatRate: 19 },
+            { name: "Costa Rica", vatRate: 13 },
+            { name: "Croatia", vatRate: 25 },
+            { name: "Cyprus", vatRate: 19 },
+            { name: "Czech Republic", vatRate: 21 },
+            { name: "Denmark", vatRate: 25 },
+            { name: "Dominican Republic", vatRate: 18 },
+            { name: "DR Congo", vatRate: 16 },
+            { name: "Ecuador", vatRate: 12 },
+            { name: "Egypt", vatRate: 14 },
+            { name: "El Salvador", vatRate: 13 },
+            { name: "Equatorial Guinea", vatRate: 15 },
+            { name: "Estonia", vatRate: 22 },
+            { name: "Eswatini", vatRate: 15 },
+            { name: "Ethiopia", vatRate: 15 },
+            { name: "Fiji", vatRate: 15 },
+            { name: "Finland", vatRate: 25.5 },
+            { name: "France", vatRate: 20 },
+            { name: "Gabon", vatRate: 18 },
+            { name: "Georgia", vatRate: 18 },
+            { name: "Germany", vatRate: 19 },
+            { name: "Ghana", vatRate: 15 },
+            { name: "Greece", vatRate: 24 },
+            { name: "Guatemala", vatRate: 12 },
+            { name: "Guyana", vatRate: 14 },
+            { name: "Honduras", vatRate: 15 },
+            { name: "Hungary", vatRate: 27 },
+            { name: "Iceland", vatRate: 24 },
+            { name: "India", vatRate: 18 },
+            { name: "Indonesia", vatRate: 11 },
+            { name: "Ireland", vatRate: 23 },
+            { name: "Israel", vatRate: 17 },
+            { name: "Italy", vatRate: 22 },
+            { name: "Ivory Coast", vatRate: 18 },
+            { name: "Jamaica", vatRate: 15 },
+            { name: "Japan", vatRate: 10 },
+            { name: "Jersey", vatRate: 5 },
+            { name: "Jordan", vatRate: 16 },
+            { name: "Kazakhstan", vatRate: 12 },
+            { name: "Kenya", vatRate: 16 },
+            { name: "Kyrgyzstan", vatRate: 12 },
+            { name: "Laos", vatRate: 10 },
+            { name: "Latvia", vatRate: 21 },
+            { name: "Lebanon", vatRate: 11 },
+            { name: "Liechtenstein", vatRate: 8.1 },
+            { name: "Lithuania", vatRate: 21 },
+            { name: "Luxembourg", vatRate: 17 },
+            { name: "Malaysia", vatRate: 10 },
+            { name: "Maldives", vatRate: 8 },
+            { name: "Malta", vatRate: 18 },
+            { name: "Mauritania", vatRate: 16 },
+            { name: "Mauritius", vatRate: 15 },
+            { name: "Mexico", vatRate: 16 },
+            { name: "Moldova", vatRate: 20 },
+            { name: "Mongolia", vatRate: 10 },
+            { name: "Montenegro", vatRate: 21 },
+            { name: "Morocco", vatRate: 20 },
+            { name: "Mozambique", vatRate: 16 },
+            { name: "Namibia", vatRate: 15 },
+            { name: "Netherlands", vatRate: 21 },
+            { name: "New Zealand", vatRate: 15 },
+            { name: "Nicaragua", vatRate: 15 },
+            { name: "Nigeria", vatRate: 7.5 },
+            { name: "North Macedonia", vatRate: 18 },
+            { name: "Norway", vatRate: 25 },
+            { name: "Oman", vatRate: 5 },
+            { name: "Pakistan", vatRate: 18 },
+            { name: "Palestine", vatRate: 16 },
+            { name: "Panama", vatRate: 7 },
+            { name: "Papua New Guinea", vatRate: 10 },
+            { name: "Paraguay", vatRate: 10 },
+            { name: "Peru", vatRate: 18 },
+            { name: "Philippines", vatRate: 12 },
+            { name: "Poland", vatRate: 23 },
+            { name: "Portugal", vatRate: 23 },
+            { name: "Puerto Rico", vatRate: 11.5 },
+            { name: "Romania", vatRate: 19 },
+            { name: "Russia", vatRate: 20 },
+            { name: "Rwanda", vatRate: 18 },
+            { name: "Saint Lucia", vatRate: 12.5 },
+            { name: "Saudi Arabia", vatRate: 15 },
+            { name: "Senegal", vatRate: 18 },
+            { name: "Serbia", vatRate: 20 },
+            { name: "Singapore", vatRate: 9 },
+            { name: "Slovakia", vatRate: 20 },
+            { name: "Slovenia", vatRate: 22 },
+            { name: "South Africa", vatRate: 15 },
+            { name: "South Korea", vatRate: 10 },
+            { name: "Spain", vatRate: 21 },
+            { name: "Sri Lanka", vatRate: 18 },
+            { name: "Sweden", vatRate: 25 },
+            { name: "Switzerland", vatRate: 8.1 },
+            { name: "Taiwan", vatRate: 5 },
+            { name: "Tajikistan", vatRate: 14 },
+            { name: "Tanzania", vatRate: 18 },
+            { name: "Thailand", vatRate: 7 },
+            { name: "Timor-Leste", vatRate: 2.5 },
+            { name: "Trinidad and Tobago", vatRate: 12.5 },
+            { name: "Tunisia", vatRate: 19 },
+            { name: "Turkey", vatRate: 20 },
+            { name: "Turkmenistan", vatRate: 15 },
+            { name: "Uganda", vatRate: 18 },
+            { name: "Ukraine", vatRate: 20 },
+            { name: "United Arab Emirates", vatRate: 5 },
+            { name: "United Kingdom", vatRate: 20 },
+            { name: "Uruguay", vatRate: 22 },
+            { name: "Uzbekistan", vatRate: 12 },
+            { name: "Vanuatu", vatRate: 15 },
+            { name: "Vietnam", vatRate: 10 },
+            { name: "Zimbabwe", vatRate: 15 }
+        ];
+
+        // Country Selector Component
+        const CountrySelector = ({ selectedCountry, onCountrySelect }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredCountries = countries.filter(country =>
+                country.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const handleCountrySelect = (country) => {
+                onCountrySelect(country);
+                setIsOpen(false);
+                setSearchTerm('');
+            };
+
+            return (
+                <div className="relative">
+                    <button
+                        type="button"
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-60 justify-between bg-white text-black border border-gray-300 rounded-md px-3 py-2 text-sm flex items-center"
+                    >
+                        {selectedCountry
+                            ? `${selectedCountry} (${countries.find(country => country.name === selectedCountry)?.vatRate}%)`
+                            : "Select country..."}
+                        <svg className="ml-2 h-4 w-4 shrink-0 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        </svg>
+                    </button>
+                    
+                    {isOpen && (
+                        <div className="absolute z-50 w-60 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                            <div className="p-2">
+                                <input
+                                    type="text"
+                                    placeholder="Search country..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                />
+                            </div>
+                            <div>
+                                {filteredCountries.length === 0 ? (
+                                    <div className="px-3 py-2 text-sm text-gray-500">No country found.</div>
+                                ) : (
+                                    filteredCountries.map((country) => (
+                                        <button
+                                            key={country.name}
+                                            onClick={() => handleCountrySelect(country)}
+                                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 flex items-center"
+                                        >
+                                            <svg
+                                                className={`mr-2 h-4 w-4 ${selectedCountry === country.name ? "opacity-100" : "opacity-0"}`}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            {country.name} ({country.vatRate}%)
+                                        </button>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // VAT Inputs Component
+        const VATInputs = ({
+            amount,
+            vatPercentage,
+            selectedCountry,
+            onAmountChange,
+            onVatPercentageChange,
+            onCountrySelect,
+            onCalculate,
+            onEnterKeyPress
+        }) => {
+            return (
+                <div className="bg-blue-500 p-8 rounded-lg mb-8">
+                    <div className="flex flex-wrap items-center justify-center gap-4">
+                        <div className="flex items-center gap-2 px-[14px]">
+                            <label htmlFor="amount" className="text-white font-semibold text-lg">
+                                Amount:
+                            </label>
+                            <input
+                                id="amount"
+                                type="number"
+                                value={amount}
+                                onChange={(e) => onAmountChange(e.target.value)}
+                                className="w-32 bg-white rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        onEnterKeyPress();
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <label className="text-white font-semibold text-lg">VAT</label>
+                            <CountrySelector
+                                selectedCountry={selectedCountry}
+                                onCountrySelect={onCountrySelect}
+                            />
+                            <input
+                                type="number"
+                                value={vatPercentage}
+                                onChange={(e) => onVatPercentageChange(e.target.value)}
+                                className="w-16 bg-white mx-[3px] px-[8px] rounded-md border border-gray-300 py-2 text-sm"
+                            />
+                            <span className="text-white font-semibold">%</span>
+                        </div>
+
+                        <button
+                            onClick={onCalculate}
+                            className="bg-white text-blue-500 hover:bg-gray-100 font-semibold px-6 py-2 rounded-md transition-colors"
+                        >
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // VAT Results Component
+        const VATResults = ({ results }) => {
+            const formatNumber = (num) => {
+                return num.toFixed(2);
+            };
+
+            return (
+                <div className="space-y-6">
+                    <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                        <div className="grid grid-cols-5 gap-4 text-center">
+                            <div>
+                                <div className="font-semibold text-blue-800">Amount:</div>
+                                <div className="text-blue-700">{formatNumber(results[1].amount)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">VAT, %:</div>
+                                <div className="text-blue-700">{formatNumber(results[1].vatPercentage)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">Operation:</div>
+                                <div className="text-blue-700">add VAT</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">VAT added:</div>
+                                <div className="text-blue-700">{formatNumber(results[1].vatAmount)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">Gross amount:</div>
+                                <div className="text-blue-700">{formatNumber(results[1].finalAmount)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                        <div className="grid grid-cols-5 gap-4 text-center">
+                            <div>
+                                <div className="font-semibold text-blue-800">Amount:</div>
+                                <div className="text-blue-700">{formatNumber(results[0].amount)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">VAT, %:</div>
+                                <div className="text-blue-700">{formatNumber(results[0].vatPercentage)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">Operation:</div>
+                                <div className="text-blue-700">exclude VAT</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">VAT excluded:</div>
+                                <div className="text-blue-700">{formatNumber(results[0].vatAmount)}</div>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-blue-800">Net amount:</div>
+                                <div className="text-blue-700">{formatNumber(results[0].finalAmount)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main VAT Calculator Component
+        const VATCalculator = () => {
+            const [amount, setAmount] = useState('0');
+            const [vatPercentage, setVatPercentage] = useState('0');
+            const [selectedCountry, setSelectedCountry] = useState('');
+            const [results, setResults] = useState([
+                {
+                    amount: 0,
+                    vatPercentage: 0,
+                    vatAmount: 0,
+                    finalAmount: 0
+                },
+                {
+                    amount: 0,
+                    vatPercentage: 0,
+                    vatAmount: 0,
+                    finalAmount: 0
+                }
+            ]);
+
+            const calculateVAT = () => {
+                const amountValue = parseFloat(amount);
+                const vatPercent = parseFloat(vatPercentage);
+                
+                if (isNaN(amountValue) || isNaN(vatPercent)) {
+                    return;
+                }
+
+                // Calculate VAT to be added to get gross amount
+                const vatAmount = amountValue * vatPercent / 100;
+                const finalAmount = amountValue + vatAmount;
+
+                // Calculate VAT that's included in the gross amount
+                const includedVatAmount = amountValue * vatPercent / (100 + vatPercent);
+                const netAmount = amountValue - includedVatAmount;
+
+                const addResult = {
+                    amount: amountValue,
+                    vatPercentage: vatPercent,
+                    vatAmount: vatAmount,
+                    finalAmount: finalAmount
+                };
+
+                const excludeResult = {
+                    amount: amountValue,
+                    vatPercentage: vatPercent,
+                    vatAmount: includedVatAmount,
+                    finalAmount: netAmount
+                };
+
+                setResults([excludeResult, addResult]);
+            };
+
+            const handleCountrySelect = (country) => {
+                setSelectedCountry(country.name);
+                setVatPercentage(country.vatRate.toString());
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50 p-6">
+                    <div className="max-w-4xl mx-auto">
+                        <VATInputs
+                            amount={amount}
+                            vatPercentage={vatPercentage}
+                            selectedCountry={selectedCountry}
+                            onAmountChange={setAmount}
+                            onVatPercentageChange={setVatPercentage}
+                            onCountrySelect={handleCountrySelect}
+                            onCalculate={calculateVAT}
+                            onEnterKeyPress={calculateVAT}
+                        />
+
+                        <VATResults results={results} />
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<VATCalculator />, document.getElementById('vat-calculator-root'));
+    </script>
+</body>
+</html>
